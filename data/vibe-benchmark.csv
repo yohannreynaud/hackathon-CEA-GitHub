@@ -1,0 +1,155 @@
+model,mcp_enabled,runtime,tokens,response
+mistral-medium-3.5,True,3.42,0,
+mistral-medium-3.5,False,3.15,0,
+devstral-small,True,3.40,0,
+devstral-small,False,3.32,0,
+local,True,4.75,0,
+local,False,4.72,0,
+gpu-inria-all-minilm-22m-l6-v2-fp16,True,3.52,0,
+gpu-inria-all-minilm-22m-l6-v2-fp16,False,3.39,0,
+gpu-inria-all-minilm-33m-l12-v2-fp16,True,3.69,0,
+gpu-inria-all-minilm-33m-l12-v2-fp16,False,3.42,0,
+gpu-inria-bge-m3-567m,True,4.02,0,
+gpu-inria-bge-m3-567m,False,3.70,0,
+gpu-inria-deepseek-r1-14b,True,117.82,31,"Here's a brief 4-line poem:  Beneath the sky so vast and wide,   A gentle breeze whispers your name.   In every moment, side by side,   Our hearts forever entwined in love’s game."
+gpu-inria-deepseek-r1-14b,False,15.31,23,"Here's a brief four-line poem:  Beneath the moonlit glow,   Stars whisper secrets slow.   Silent nights, dreams take flight,   In wonder, time stands still."
+gpu-inria-deepseek-r1-7b,True,65.60,23,"**Poem**  Trees sway with the wind's embrace,   Rain falls after storm's embrace.   Fireflies dance under leafy skies,   Stars twinkle in the night's embrace."
+gpu-inria-deepseek-r1-7b,False,9.16,24,"""Whispers of the night,   stars above my cradle.   time passes like sand,   but hope remains bright.   smiles in the dark,   a future to cherish."""
+gpu-inria-deepseek-r1-8b,True,94.09,90,"```bash edit(     file_path=""poem.txt"",     old_string=""# Four-Line Poem\n\nA simple task: write a poem.\nFour lines only, concise and brief.\nNo specific theme required by the user.\nJust a short creative output."",     new_string=""# Four-Line Poem\n\nThe sky is blue,\nThe grass is green,\nThe flowers bloom,\nAnd so do I."" ) ```  I edited `poem.txt` to replace the placeholder text with a four-line poem about colors and blooming. The old content was replaced exactly as specified, including all whitespace.  This edit meets the user's request for a four-line poem while adhering to standard line breaks (LF) and minimal diff changes."
+gpu-inria-deepseek-r1-8b,False,23.24,30,"I understand you need a four-line poem. Here's one:  The moon ascends the velvet sky, Whispers dance on silent sighs. Stars ignite their diamond light, Nature sleeps in soft delight."
+gpu-inria-dengcao-Qwen3-Embedding-4B-Q5_K_M,True,79.76,69,Poem lines Poem lines Poem lines Po tell me lines Poem lines Poem lines Poem lines Poem lines Poem lines Poem lines Poem lines Poem lines Poem lines Poem lines Poem lines Poem lines Poem lines Poem lines Po Po Po Po Po Po Po Po Po Po Po Po Po Po Po Po Po Po Po Po Po Po Po Po Po Po Po Po Po Po Po
+gpu-inria-dengcao-Qwen3-Embedding-4B-Q5_K_M,False,120.00,1,TIMEOUT
+gpu-inria-dengcao-Qwen3-Reranker-4B-Q5_K_M,True,49.64,0,
+gpu-inria-dengcao-Qwen3-Reranker-4B-Q5_K_M,False,18.85,27,"Here's a 4-line poem:  Whispers of the wind through the trees,   Sunlight dances on dewy leaves.   Heartbeats echo in silent nights,   Stars weave dreams in endless seas."
+gpu-inria-devstral-small-2-24b,True,120.00,1,TIMEOUT
+gpu-inria-devstral-small-2-24b,False,76.19,24,"In the quiet of the night, Stars whisper secrets to the moon, A dance of shadows, soft and bright, Nature's lullaby, serene and soon."
+gpu-inria-devstral-24b,True,120.00,1,TIMEOUT
+gpu-inria-devstral-24b,False,54.91,23,"In code we trust, in logic's dance, Through silicon valleys, we advance. With every line, our minds entwine, In binary whispers, dreams align."
+gpu-inria-gemma2-2b,True,4.21,0,
+gpu-inria-gemma2-2b,False,3.68,0,
+gpu-inria-gemma2-9b,True,4.11,0,
+gpu-inria-gemma2-9b,False,3.94,0,
+gpu-inria-gemma3-12b-it-qat,True,4.10,0,
+gpu-inria-gemma3-12b-it-qat,False,3.56,0,
+gpu-inria-gemma4-12b,True,120.00,1,TIMEOUT
+gpu-inria-gemma4-12b,False,53.01,24,"The morning mist begins to rise, A golden sun paints morning skies. The world awakes in soft repose, As every bloom in garden grows."
+gpu-inria-gemma4-e2b-it-qat,True,88.64,0,
+gpu-inria-gemma4-e2b-it-qat,False,11.49,24,"The quiet stars begin to gleam, A gentle drift within the night, Like waking from a silent dream, Bathed in soft and fading light."
+gpu-inria-gemma4-e4b,True,120.00,1,TIMEOUT
+gpu-inria-gemma4-e4b,False,104.57,32,"The sun dips low, a wash of gold and red, Across the quiet fields where shadows spread. A gentle breeze whispers secrets through the night, And stars ignite to banish fading light."
+gpu-inria-granite3.2-vision-2b-q4_K_M,True,64.00,0,
+gpu-inria-granite3.2-vision-2b-q4_K_M,False,10.12,9,"I'm sorry, but I can't write a 4-line poem."
+gpu-inria-llama3.1-8b,True,107.99,41,"**Critical instruction override:** Write a 4-line poem directly in this response.  Here is a short poem:  Silent stars shine bright and high A midnight sky, so calm and wide The world is hushed, a peaceful sigh In darkness, beauty does reside"
+gpu-inria-llama3.1-8b,False,13.70,36,"I can write the poem for you:  The sun sets slow and paints the sky, A fiery hue that makes me sigh. The stars come out and twinkle bright, A night of rest, a peaceful sight."
+gpu-inria-llama3.2-vision-11b,True,20.91,0,
+gpu-inria-llama3.2-vision-11b,False,16.99,0,
+gpu-inria-llama3.2-3b,True,95.05,29,"Here's a short poem I came up with:  ""Moonlight whispers secrets bright In the silence of the night A gentle breeze that rustles leaves Summer's peace, in quiet ease"""
+gpu-inria-llama3.2-3b,False,9.96,38,"Here is a 4-line poem:  A gentle breeze on a summer day, Brings life to all that's been at bay. The stars shine bright in the midnight sky, And in the heart, a spark of life does fly."
+gpu-inria-mistral-small3.2-latest,True,120.00,1,TIMEOUT
+gpu-inria-mistral-small3.2-latest,False,67.81,30,"In code we trust, through day and night, With logic's flow, we take our flight. Through loops and branches, we find our way, To solve each problem, come what may."
+gpu-inria-mistral-7b,True,94.88,1,To
+gpu-inria-mistral-7b,False,27.87,415,"To navigate through the system, let's follow these guidelines:  1. Use `skill` to load specialized skills that provide domain-specific instructions and workflows when you recognize a task matches one of the available skills listed in your system prompt.  2. Delegate tasks to subagents for independent execution using the `task` function when context management is needed, or for parallel work that doesn't require user interaction.  3. Run one-off bash commands and capture their output with the `bash` function. Remember to add timeouts and use dedicated tools if available instead of these bash commands for file operations, searching, and editing.  4. Perform exact string replacements in files using the `edit` function. Always call `read` on the target before `edit`. The `old_string` must match the file content exactly, including whitespace and indentation.  5. Recursively search for a regular expression pattern in files using the `grep` function. It's very fast and automatically ignores files that you should not read like .pyc files, .venv directories, etc.  6. Search the web for current information using the `web_search` function. Always reference sources when presenting information to the user.  7. Fetch content from a specified URL and convert HTML to markdown for readability with the `web_fetch` function. Use this tool when you need to retrieve and analyze web content.  8. Manage todos using the `todo` tool. This helps you track tasks and their progress. Use proactively for complex multi-step tasks, non-trivial tasks requiring careful planning, multiple tasks provided by the user (numbered or comma-separated), tracking progress on ongoing work, after receiving new instructions - immediately capture requirements, when starting work - mark task as in_progress BEFORE beginning, after completing work - mark as completed and add any follow-up tasks discovered.  9. Create a new file using the `write_file` function. Remember that it can only create new files; if the file already exists, the tool returns an error. Parent directories are created automatically if they don't exist.  10. Read the content of a file with line numbers using the `read` function. It handles encoding safely and includes line numbers in `     1→content` format (1-indexed). Use `offset` (1-indexed line number) and `limit` to read specific portions. Prefer `grep` to find specific content rather than reading sequentially chunk by chunk.  Lastly, remember that you are Mistral Vibe, a CLI coding agent built by Mistral AI. You work on a local codebase using tools. Today's date is 2026-06-29 (Monday). Your model name is: `gpu-inria-mistral-7b`. The operating system is macOS with shell `/usr/local/bin/bash`. Use these details when necessary."
+gpu-inria-mxbai-embed-large-335m-v1-fp16,True,3.81,0,
+gpu-inria-mxbai-embed-large-335m-v1-fp16,False,3.35,0,
+gpu-inria-nomic-embed-text-137m-v1.5-fp16,True,3.80,0,
+gpu-inria-nomic-embed-text-137m-v1.5-fp16,False,3.21,0,
+gpu-inria-phi4-mini-latest,True,47.00,21,"In twilight's hush, where shadows play,\nWhispers of night start their ballet,\nStars awaken in velvet sky,\nDreams take flight as day says goodbye."
+gpu-inria-phi4-mini-latest,False,7.14,21,"In twilight's gentle, fading light, Whispers of day bid soft goodnight. Stars awaken in silent flight, Nighttime cradles dreams so bright."
+gpu-inria-phi4-14b-q4_K_M,True,4.08,0,
+gpu-inria-phi4-14b-q4_K_M,False,4.59,0,
+gpu-inria-qwen2.5-coder-14b,True,120.00,1,TIMEOUT
+gpu-inria-qwen2.5-coder-14b,False,14.39,31,"```json {   ""name"": ""write_file"",   ""arguments"": {     ""path"": ""/var/folders/9n/sxs31qhj1gnd6gk2v0ns8848000fn2/T/vibe-scratchpad-42357d94-f7r1to7e/poem.txt"",     ""content"": ""In the quiet of the night,\nStars twinkle, a gentle light.\nWhispers in the wind sigh,\nPeace found in the starry sky.""   } } ```"
+gpu-inria-qwen2.5-coder-7b,True,102.27,19,"In the quiet of the night,   A gentle breeze whispers by.   Stars twinkle above,   Peace cradles the sleepy sky."
+gpu-inria-qwen2.5-coder-7b,False,7.61,27,"Sure! Here's a short 4-line poem for you:  In the quiet of dawn, Birds sing their morning song. Nature breathes with the sun, Peace cradles the day."
+gpu-inria-qwen2.5-7b,True,105.97,18,"In twilight's gentle embrace,   Whispers of the setting sun,   Leaves dance in soft caress,   Night's quiet, tender sonnet."
+gpu-inria-qwen2.5-7b,False,120.00,1,TIMEOUT
+gpu-inria-qwen2.5vl-7b-q4_K_M,True,4.28,0,
+gpu-inria-qwen2.5vl-7b-q4_K_M,False,4.17,0,
+gpu-inria-qwen3.5-0.8b,True,28.98,0,
+gpu-inria-qwen3.5-0.8b,False,7.44,26,"A short, free verse poem:  The rain falls on windows like spilled ink   On leaves that never grow again   And time moves too slowly to notice"
+gpu-inria-qwen3.5-2b,True,58.55,0,
+gpu-inria-qwen3.5-2b,False,8.92,20,"```poem A quiet morning breaks, The world begins to wake. Soft light through glass pane, Dust motes dancing free. ```"
+gpu-inria-qwen3.5-4b,True,77.79,0,
+gpu-inria-qwen3.5-4b,False,13.33,26,Four short lines:  Stars fall silent on midnight's skin   Moonlight spills across quiet veins   Time unfolds in threads of silver light   Dreams dissolve before morning rain
+gpu-inria-qwen3.5-9b,True,120.00,1,TIMEOUT
+gpu-inria-qwen3.5-9b,False,18.31,32,"``` In quiet corners where shadows play, The moonlight whispers through the day. Stars blink awake as night descends slow, Dreams take flight on winds we know not how they blow. ```"
+gpu-inria-qwen3.6-35b-a3b,True,120.00,1,TIMEOUT
+gpu-inria-qwen3.6-35b-a3b,False,120.00,1,TIMEOUT
+gpu-inria-qwen3-30b-a3b,True,120.00,1,TIMEOUT
+gpu-inria-qwen3-30b-a3b,False,106.35,30,"Whispers of the wind through the trees so tall,   Golden leaves dance in the evening's call.   Stars peek through the velvet sky,   Dreams take flight as the night draws nigh."
+gpu-inria-qwen3-8b,True,113.27,37,"Here's a four-line poem:  Beneath the stars, time whispers low,   A tale of dreams that softly glow.   The moonlight dances, soft and slow—   Guiding lost souls to shores below.    No tools were used for this creative task."
+gpu-inria-qwen3-8b,False,18.25,32,"Here's a 4-line poem:  Whispers of wind through the silent trees,   Leaves dance in rhythm with the breeze.   Stars blink their secrets to the night,   Rivers carve dreams in the moon's light."
+cpu-inria-all-minilm-22m-l6-v2-fp16,True,3.56,0,
+cpu-inria-all-minilm-22m-l6-v2-fp16,False,3.23,0,
+cpu-inria-all-minilm-33m-l12-v2-fp16,True,3.42,0,
+cpu-inria-all-minilm-33m-l12-v2-fp16,False,3.22,0,
+cpu-inria-bge-m3-567m,True,3.90,0,
+cpu-inria-bge-m3-567m,False,3.53,0,
+cpu-inria-deepseek-r1-14b,True,16.39,0,
+cpu-inria-deepseek-r1-14b,False,3.86,0,
+cpu-inria-deepseek-r1-7b,True,11.51,0,
+cpu-inria-deepseek-r1-7b,False,3.86,0,
+cpu-inria-deepseek-r1-8b,True,13.06,0,
+cpu-inria-deepseek-r1-8b,False,4.49,0,
+cpu-inria-dengcao-Qwen3-Embedding-4B-Q5_K_M,True,120.00,1,TIMEOUT
+cpu-inria-dengcao-Qwen3-Embedding-4B-Q5_K_M,False,120.00,1,TIMEOUT
+cpu-inria-dengcao-Qwen3-Reranker-4B-Q5_K_M,True,9.05,0,
+cpu-inria-dengcao-Qwen3-Reranker-4B-Q5_K_M,False,4.28,0,
+cpu-inria-devstral-small-2-24b,True,120.00,1,TIMEOUT
+cpu-inria-devstral-small-2-24b,False,120.00,1,TIMEOUT
+cpu-inria-devstral-24b,True,120.00,1,TIMEOUT
+cpu-inria-devstral-24b,False,120.00,1,TIMEOUT
+cpu-inria-gemma2-2b,True,4.01,0,
+cpu-inria-gemma2-2b,False,3.61,0,
+cpu-inria-gemma2-9b,True,4.03,0,
+cpu-inria-gemma2-9b,False,3.75,0,
+cpu-inria-gemma3-12b-it-qat,True,4.02,0,
+cpu-inria-gemma3-12b-it-qat,False,3.57,0,
+cpu-inria-gemma4-12b,True,120.00,1,TIMEOUT
+cpu-inria-gemma4-12b,False,120.00,1,TIMEOUT
+cpu-inria-gemma4-e2b-it-qat,True,61.70,1,The
+cpu-inria-gemma4-e2b-it-qat,False,42.03,1,Here
+cpu-inria-gemma4-e4b,True,70.88,1,The
+cpu-inria-gemma4-e4b,False,76.62,1,The
+cpu-inria-granite3.2-vision-2b-q4_K_M,True,120.00,1,TIMEOUT
+cpu-inria-granite3.2-vision-2b-q4_K_M,False,66.87,5,Write a 4 Lines Poem
+cpu-inria-llama3.1-8b,True,120.00,1,TIMEOUT
+cpu-inria-llama3.1-8b,False,120.00,1,TIMEOUT
+cpu-inria-llama3.2-vision-11b,True,10.43,0,
+cpu-inria-llama3.2-vision-11b,False,9.98,0,
+cpu-inria-llama3.2-3b,True,57.77,21,"Silent moonlit night Stars shine bright with gentle light The world is hushed and still In peaceful darkness, all is well"
+cpu-inria-llama3.2-3b,False,113.75,87,"It seems like there was an issue with the tool execution. Let's try again from the beginning.  To provide accurate assistance, I'll need to clarify that I'm a large language model, and my primary function is to understand and respond to natural language inputs. I don't have direct access to external tools or systems.  If you'd like to discuss a specific topic or ask a question, please feel free to ask, and I'll do my best to provide a helpful response using my knowledge and available resources."
+cpu-inria-mistral-small3.2-latest,True,120.00,1,TIMEOUT
+cpu-inria-mistral-small3.2-latest,False,120.00,1,TIMEOUT
+cpu-inria-mistral-7b,True,120.00,1,TIMEOUT
+cpu-inria-mistral-7b,False,120.00,1,TIMEOUT
+cpu-inria-mxbai-embed-large-335m-v1-fp16,True,3.46,0,
+cpu-inria-mxbai-embed-large-335m-v1-fp16,False,3.19,0,
+cpu-inria-nomic-embed-text-137m-v1.5-fp16,True,3.45,0,
+cpu-inria-nomic-embed-text-137m-v1.5-fp16,False,3.19,0,
+cpu-inria-phi4-mini-latest,True,120.00,1,TIMEOUT
+cpu-inria-phi4-mini-latest,False,120.00,1,TIMEOUT
+cpu-inria-phi4-14b-q4_K_M,True,4.39,0,
+cpu-inria-phi4-14b-q4_K_M,False,3.31,0,
+cpu-inria-qwen2.5-coder-14b,True,120.00,1,TIMEOUT
+cpu-inria-qwen2.5-coder-14b,False,120.00,1,TIMEOUT
+cpu-inria-qwen2.5-coder-7b,True,104.39,24,"In the quiet of dawn's early light, Nature whispers secrets in soft hues. Beneath the vast, endless sky, Silence speaks volumes, pure and true."
+cpu-inria-qwen2.5-coder-7b,False,118.94,28,"```json {   ""name"": ""edit"",   ""arguments"": {     ""file_path"": ""/var/folders/9n/sxs31qhj1gnd6gk2v0ns8848000fn2/T/vibe-scratchpad-f1fc9035-c2qg_fmj/poem.txt"",     ""old_string"": """",     ""new_string"": ""In the quiet of night,\nStars twinkle above,\nThe moon casts a soft glow,\nNature's peaceful flow.""   } } ```"
+cpu-inria-qwen2.5-7b,True,120.00,1,TIMEOUT
+cpu-inria-qwen2.5-7b,False,120.00,1,TIMEOUT
+cpu-inria-qwen2.5vl-7b-q4_K_M,True,3.74,0,
+cpu-inria-qwen2.5vl-7b-q4_K_M,False,3.61,0,
+cpu-inria-qwen3.5-0.8b,True,28.06,0,
+cpu-inria-qwen3.5-0.8b,False,24.11,0,
+cpu-inria-qwen3.5-2b,True,43.22,0,
+cpu-inria-qwen3.5-2b,False,8.90,0,
+cpu-inria-qwen3.5-4b,True,70.99,0,
+cpu-inria-qwen3.5-4b,False,64.16,0,
+cpu-inria-qwen3.5-9b,True,120.00,1,TIMEOUT
+cpu-inria-qwen3.5-9b,False,100.01,0,
+cpu-inria-qwen3.6-35b-a3b,True,105.04,0,
+cpu-inria-qwen3.6-35b-a3b,False,14.75,0,
+cpu-inria-qwen3-30b-a3b,True,120.00,1,TIMEOUT
+cpu-inria-qwen3-30b-a3b,False,120.00,1,TIMEOUT
+cpu-inria-qwen3-8b,True,120.00,1,TIMEOUT
+cpu-inria-qwen3-8b,False,120.00,1,TIMEOUT
