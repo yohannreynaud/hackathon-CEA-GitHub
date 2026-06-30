@@ -46,9 +46,9 @@ permission = "always"
 [tools.localdb_mcp_server_find_anomalous_bare_module_mass_tool]
 permission = "always"
 [tools.localdb_mcp_server_find_one_tool]
-permission = "always"
+permission = "ask"
 [tools.localdb_mcp_server_find_all_tool]
-permission = "always"
+permission = "ask"
 [tools.localdb_mcp_server_gridfs_list_files_tool]
 permission = "always"
 [tools.localdb_mcp_server_gridfs_get_file_metadata_tool]
