@@ -1,6 +1,6 @@
 # LocalDB MCP Server - Tool Manual
 
-Complete documentation of all **43 MCP tools** available in the LocalDB MongoDB server (38 legacy + 5 unified tools).
+Complete documentation of all **34 MCP tools** available in the LocalDB MongoDB server (25 base tools + 5 unified tools + 4 production statistics / diagnostic tools).
 
 ## Table of Contents
 
@@ -12,13 +12,13 @@ Complete documentation of all **43 MCP tools** available in the LocalDB MongoDB 
 - [Unified Tools](#unified-tools)
 - [Component Lookup](#component-lookup)
 - [Quad Module Lookup](#quad-module-lookup)
-- [Production Components](#production-components)
-- [Test Results](#test-results)
 - [QC Status](#qc-status)
 - [Temporal Queries](#temporal-queries)
 - [Advanced Queries](#advanced-queries)
 - [Comment Tools](#comment-tools)
 - [GridFS File Storage](#gridfs-file-storage)
+- [Production Statistics](#production-statistics)
+- [Diagnostic Tools](#diagnostic-tools)
 - [Quick Reference](#quick-reference)
 - [Error Handling](#error-handling)
 - [Performance Tips](#performance-tips)
@@ -27,9 +27,11 @@ Complete documentation of all **43 MCP tools** available in the LocalDB MongoDB 
 
 ## Overview
 
-The LocalDB MCP Server provides **43 specialized tools** for querying the LocalDB MongoDB database (38 legacy tools + 5 new unified tools). All tools return JSON-formatted results and support server-side filtering for optimal performance.
+The LocalDB MCP Server provides **34 specialized tools** for querying the LocalDB MongoDB database (25 base tools + 5 unified tools + 4 production statistics / diagnostic tools). All tools return JSON-formatted results and support server-side filtering for optimal performance.
 
-**Note on Unified Tools:** For new development, prefer the **5 unified tools** (see [Unified Tools](#unified-tools) section) which consolidate 13 legacy tools into a more maintainable and flexible API with 100% backward compatibility.
+**Prefer Unified Tools:** For component lookup and test queries, always use the **5 unified tools** (see [Unified Tools](#unified-tools) section) — they cover all component types with a single parameterized API.
+
+**This manual documents individual tools.** For end-to-end recipes that chain several tools together to answer a recurring question (production rate, sign-off reports, current-stage census, UNHAPPY/GRAVEYARD investigation, etc.), see the [`playbooks/`](../playbooks/) directory and [AGENT_SYSTEM_PROMPT.md](AGENT_SYSTEM_PROMPT.md) § "Question Playbooks".
 
 ### Configuration
 
@@ -47,7 +49,7 @@ Tools connect to MongoDB using environment variables:
 
 | Date | Tool | Change | Status |
 |------|------|--------|--------|
-| 2026-06-30 | **Unified Tools** | **Added 5 new unified tools** consolidating 13 legacy tools: `find_component_by_serial_unified_tool`, `find_component_by_alternative_id_unified_tool`, `find_production_components_unified_tool`, `find_latest_test_unified_tool`, `find_components_with_valid_tests_unified_tool`. All 13 equivalence tests passed (100% validation). See [Unified Tools](#unified-tools) section and [RESULTAT_UNIFIED_TOOLS.md](RESULTAT_UNIFIED_TOOLS.md) | ✅ Added |
+| 2026-06-30 | **Unified Tools** | **Added 5 unified tools** and **removed 13 redundant legacy tools**: `find_component_by_serial_unified_tool`, `find_component_by_alternative_id_unified_tool`, `find_production_components_unified_tool`, `find_latest_test_unified_tool`, `find_components_with_valid_tests_unified_tool`. All 13 equivalence tests passed before removal. See [Unified Tools](#unified-tools) section. | ✅ Done |
 | 2026-05-06 | `find_modules_by_test_criteria_tool` | **Fixed critical bug**: Tool was returning all component types (front-end chips, bare modules, etc.) instead of only modules. Added `componentType: "module"` filter to component query. **Note**: Pagination applies to TESTS not MODULES — see warning below. | ✅ Fixed |
 | 2025-XX-XX | `find_components_by_ids_tool`, `find_modules_by_test_criteria_tool`, `aggregate_tests_by_component_tool` | Added three new advanced query tools for batch component lookup, module finding with test criteria, and MongoDB aggregation with component merge. | ✅ Added |
 | 2025-XX-XX | `find_anomalous_bare_module_mass_tool` | Fixed server-side bug where tool incorrectly passed `{"$oid": "..."}` dict to MongoDB queries, causing "unknown operator: $oid" error. Now correctly extracts hex string from bson.json_util format. | ✅ Fixed |
@@ -77,7 +79,7 @@ All tools that return MongoDB documents serialize ObjectIds using `bson.json_uti
 
 ## Base Operations
 
-**See also:** [INTRO.md](INTRO.md) for component type overview and [README.md](README.md) for server configuration.
+**See also:** [INTRO.md](INTRO.md) for component type overview and [README.md](../README.md) for server configuration.
 
 ### Important: Component References in QC Collections
 
@@ -235,7 +237,7 @@ Return a compact list of tests for a component — type, stage, pass/fail, date 
 
 **Workflow:**
 1. `find_test_summary_tool` → see test types and dates
-2. `find_latest_quad_module_test_tool` → fetch the specific test you need
+2. `find_latest_test_unified_tool` → fetch the specific test you need
 
 **Parameters:**
 | Name | Type | Required | Default | Description |
@@ -261,28 +263,22 @@ Return a compact list of tests for a component — type, stage, pass/fail, date 
 
 ## Unified Tools
 
-**See also:** [unification_tool.md](unification_tool.md) for factorization details, [RESULTAT_UNIFIED_TOOLS.md](RESULTAT_UNIFIED_TOOLS.md) for test validation, [AMELIORATIONS.md](AMELIORATIONS.md) § "Priorité 1 : Factoriser les Tools Redondants"
+**See also:** [unification_tool.md](changelog/unification_tool.md) for factorization details, [RESULTAT_UNIFIED_TOOLS.md](changelog/RESULTAT_UNIFIED_TOOLS.md) for test validation, [AMELIORATIONS.md](changelog/AMELIORATIONS.md) § "Priorité 1 : Factoriser les Tools Redondants"
 
 ### Overview
 
-The **Unified Tools** represent a major refactoring effort to **reduce redundancy** and **improve maintainability** of the MCP server. As documented in [AMELIORATIONS.md](AMELIORATIONS.md), these tools consolidate **13 existing tools** into **5 unified tools** with **100% backward compatibility** (validated by 13/13 successful tests in [RESULTAT_UNIFIED_TOOLS.md](RESULTAT_UNIFIED_TOOLS.md)).
+The **Unified Tools** replaced 13 redundant legacy tools in a refactoring effort documented in [AMELIORATIONS.md](changelog/AMELIORATIONS.md). The legacy tools have been removed — the unified tools are now the only way to perform these queries.
 
-**Key Benefits:**
-- **Reduced code duplication**: 13 tools → 5 tools (62% reduction)
-- **Easier maintenance**: Single implementation to update
-- **More flexible**: Optional `component_type` parameters cover all component types
-- **Identical results**: All unified tools produce **exactly the same MongoDB queries and results** as their legacy counterparts
-- **Tested**: All 13 equivalence tests passed (see [RESULTAT_UNIFIED_TOOLS.md](RESULTAT_UNIFIED_TOOLS.md))
-
-**Migration Path:** The legacy tools remain available for backward compatibility. New code should prefer the unified tools.
+**Key design principles:**
+- **Single implementation per operation**: one tool covers all component types via an optional `component_type` parameter
+- **Flexible**: omit `component_type` to search across all types, or specify it for type-scoped queries
+- **Validated**: all 13 equivalence tests passed before the legacy tools were removed (see [RESULTAT_UNIFIED_TOOLS.md](changelog/RESULTAT_UNIFIED_TOOLS.md))
 
 ---
 
 ### `find_component_by_serial_unified_tool`
 
-**UNIFIED TOOL** - Find a component by its serial number. Replaces: `find_component_by_serial_tool`, `find_flex_pcb_by_serial_tool`, `find_bare_module_by_serial_tool`, `find_quad_module_by_serial_tool`
-
-**Use this instead of** the 4 legacy serial number lookup tools for **simplified and future-proof** component queries.
+**UNIFIED TOOL** - Find a component by its serial number. Replaced: `find_component_by_serial_tool`, `find_flex_pcb_by_serial_tool`, `find_bare_module_by_serial_tool`, `find_quad_module_by_serial_tool` (all removed).
 
 **Parameters:**
 | Name | Type | Required | Default | Description |
@@ -293,13 +289,13 @@ The **Unified Tools** represent a major refactoring effort to **reduce redundanc
 | `limit` | integer | No | 5 | Maximum results for partial matches |
 | `projection` | object | No | - | Fields to include/exclude (e.g., {"serialNumber": 1, "componentType": 1}) |
 
-**Migration Guide:**
-| Legacy Tool | Unified Equivalent |
-|-------------|-------------------|
-| `find_quad_module_by_serial_tool` | `component_type: "module"` |
-| `find_flex_pcb_by_serial_tool` | `component_type: "module_pcb"` |
-| `find_bare_module_by_serial_tool` | `component_type: "bare_module"` |
-| `find_component_by_serial_tool` | **No component_type needed** (generic search) |
+**Parameter by component type:**
+| Component type | `component_type` value |
+|----------------|----------------------|
+| Quad module | `"module"` |
+| Flex PCB | `"module_pcb"` |
+| Bare module | `"bare_module"` |
+| Any / generic | *(omit)* |
 
 **Examples:**
 ```json
@@ -349,9 +345,7 @@ The **Unified Tools** represent a major refactoring effort to **reduce redundanc
 
 ### `find_component_by_alternative_id_unified_tool`
 
-**UNIFIED TOOL** - Find a component by its alternative identifier. Replaces: `find_quad_module_by_alternative_id_tool`
-
-**Use this instead of** the legacy alternative ID lookup tool for **type-flexible** component queries.
+**UNIFIED TOOL** - Find a component by its alternative identifier. Replaced: `find_quad_module_by_alternative_id_tool` (removed).
 
 **Parameters:**
 | Name | Type | Required | Default | Description |
@@ -361,11 +355,6 @@ The **Unified Tools** represent a major refactoring effort to **reduce redundanc
 | `partial` | boolean | No | false | Enable partial match |
 | `limit` | integer | No | 5 | Maximum results |
 | `projection` | object | No | - | Fields to include/exclude |
-
-**Migration Guide:**
-| Legacy Tool | Unified Equivalent |
-|-------------|-------------------|
-| `find_quad_module_by_alternative_id_tool` | `component_type: "module"` (or omit for generic) |
 
 **Examples:**
 ```json
@@ -389,15 +378,13 @@ The **Unified Tools** represent a major refactoring effort to **reduce redundanc
 }
 ```
 
-**Note:** The filter uses MongoDB `$elemMatch` on properties: `{"componentType": "module", "properties": {"$elemMatch": {"code": "ALTERNATIVE_IDENTIFIER", "value": "Paris0076"}}}`
+**Note — scope:** When `component_type` is **omitted**, the search spans **all** component types. To restrict to modules only, always pass `component_type: "module"`. Example filter: `{"componentType": "module", "properties": {"$elemMatch": {"code": "ALTERNATIVE_IDENTIFIER", "value": "Paris0076"}}}`
 
 ---
 
 ### `find_production_components_unified_tool`
 
-**UNIFIED TOOL** - Find production components with optional filters. Replaces: `find_production_quad_modules_tool`, `find_production_flex_pcbs_tool`, `find_production_bare_modules_tool`
-
-**Use this instead of** the 3 legacy production component tools for **consistent filtering** across all production component types.
+**UNIFIED TOOL** - Find production components with optional filters. Replaced: `find_production_quad_modules_tool`, `find_production_flex_pcbs_tool`, `find_production_bare_modules_tool` (all removed).
 
 **Parameters:**
 | Name | Type | Required | Default | Description |
@@ -414,12 +401,12 @@ The **Unified Tools** represent a major refactoring effort to **reduce redundanc
 
 **CAUTION:** Large collection. Use `count_tool` first to check volume.
 
-**Migration Guide:**
-| Legacy Tool | Unified Equivalent |
-|-------------|-------------------|
-| `find_production_quad_modules_tool` | `component_type: "module"` |
-| `find_production_flex_pcbs_tool` | `component_type: "module_pcb"` |
-| `find_production_bare_modules_tool` | `component_type: "bare_module"` |
+**Parameter by component type:**
+| Component type | `component_type` value |
+|----------------|----------------------|
+| Quad module | `"module"` |
+| Flex PCB | `"module_pcb"` |
+| Bare module | `"bare_module"` |
 
 **Examples:**
 ```json
@@ -462,13 +449,13 @@ The **Unified Tools** represent a major refactoring effort to **reduce redundanc
 
 **Note:** Filters on `properties` use MongoDB `$elemMatch` with `$all` for multiple property filters, generating **strictly equivalent queries** to legacy tools.
 
+**Note — implicit PCB production filter:** When `component_type: "module_pcb"` is used, the tool automatically adds `PCB_DESIGN_VERSION: {$in: ["4", "5"]}` to restrict results to production PCB designs only. If you need all PCBs regardless of design version, use `find_all_tool` directly on the `component` collection with `filter: {"componentType": "module_pcb"}`.
+
 ---
 
 ### `find_latest_test_unified_tool`
 
-**UNIFIED TOOL** - Find the latest test of a specific type for a component at a given stage. Replaces: `find_latest_quad_module_test_tool`, `find_latest_pcb_test_tool`, `find_latest_bare_module_test_tool`
-
-**Use this instead of** the 3 legacy latest test tools for **consistent test retrieval** across all component types.
+**UNIFIED TOOL** - Find the latest test of a specific type for a component at a given stage. Replaced: `find_latest_quad_module_test_tool`, `find_latest_pcb_test_tool`, `find_latest_bare_module_test_tool` (all removed).
 
 **Parameters:**
 | Name | Type | Required | Description |
@@ -478,12 +465,12 @@ The **Unified Tools** represent a major refactoring effort to **reduce redundanc
 | `stage` | string | Yes | Production stage (e.g., 'MODULE/ASSEMBLY', 'PCB_RECEPTION_MODULE_SITE', 'BAREMODULERECEPTION') |
 | `projection` | object | No | Fields to include/exclude |
 
-**Migration Guide:**
-| Legacy Tool | Stage | Unified Equivalent |
-|-------------|-------|-------------------|
-| `find_latest_quad_module_test_tool` | Variable | **Explicitly specify stage** |
-| `find_latest_pcb_test_tool` | PCB_RECEPTION_MODULE_SITE | `stage: "PCB_RECEPTION_MODULE_SITE"` |
-| `find_latest_bare_module_test_tool` | BAREMODULERECEPTION | `stage: "BAREMODULERECEPTION"` |
+**Stage by component type:**
+| Component | `stage` value |
+|-----------|--------------|
+| Quad module | any (specify explicitly) |
+| Flex PCB | `"PCB_RECEPTION_MODULE_SITE"` |
+| Bare module | `"BAREMODULERECEPTION"` |
 
 **Examples:**
 ```json
@@ -521,20 +508,18 @@ The **Unified Tools** represent a major refactoring effort to **reduce redundanc
 }
 ```
 
-**Note:** Uses the underlying `find_latest_test_for_component` function with identical sort criteria (`[("date", -1)]`). **Stage parameter is now required** to ensure explicit stage specification.
+**Note:** Uses the underlying `find_latest_test_for_component` function with identical sort criteria: `[("prodDB_record.date", -1), ("results.property.MEASUREMENT_DATE", -1), ("sys.cts", -1)]`. **Stage parameter is now required** to ensure explicit stage specification.
 
 ---
 
 ### `find_components_with_valid_tests_unified_tool`
 
-**UNIFIED TOOL** - Find components with valid tests of specified types. Replaces: `find_pcb_with_valid_tests_tool`, `find_bare_modules_with_valid_tests_tool`
-
-**Use this instead of** the 2 legacy valid test tools for **type-flexible** component validation queries.
+**UNIFIED TOOL** - Find components with valid tests of specified types. Replaced: `find_pcb_with_valid_tests_tool`, `find_bare_modules_with_valid_tests_tool` (both removed).
 
 **Parameters:**
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
-| `component_type` | string | Yes | - | Component type: 'PCB', 'BARE_MODULE', 'MODULE' (note: uppercase for consistency with legacy) |
+| `component_type` | string | Yes | - | Component type: `'PCB'`, `'BARE_MODULE'`, or `'MODULE'` (uppercase, for consistency with QC.module.status collection values) |
 | `test_types` | array | No | - | List of test types to check for validity |
 | `limit` | integer | No | 10 | Maximum results (hard cap: 50) |
 | `skip` | integer | No | 0 | Results to skip for pagination |
@@ -542,11 +527,12 @@ The **Unified Tools** represent a major refactoring effort to **reduce redundanc
 
 **CAUTION:** Large collection. Use `count_tool` first to check volume.
 
-**Migration Guide:**
-| Legacy Tool | Unified Equivalent |
-|-------------|-------------------|
-| `find_pcb_with_valid_tests_tool` | `component_type: "PCB"` |
-| `find_bare_modules_with_valid_tests_tool` | `component_type: "BARE_MODULE"` |
+**Parameter by component type:**
+| Component | `component_type` value |
+|-----------|----------------------|
+| Flex PCB | `"PCB"` |
+| Bare module | `"BARE_MODULE"` |
+| Quad module | `"MODULE"` → stage `MODULE/ASSEMBLY` |
 
 **Examples:**
 ```json
@@ -573,76 +559,19 @@ The **Unified Tools** represent a major refactoring effort to **reduce redundanc
 }
 ```
 
-**Note:** Filters on `QC_results_pdb` use stage-specific paths. For PCBs: `QC_results_pdb.PCB_RECEPTION_MODULE_SITE.<test_type>`, for bare modules: `QC_results_pdb.BAREMODULERECEPTION.<test_type>`. **Mappings are automatic** based on `component_type`.
+**Note:** Filters on `QC_results_pdb` use stage-specific paths that are resolved automatically from `component_type`:
+
+| `component_type` | Stage path used |
+|------------------|----------------|
+| `PCB` | `QC_results_pdb.PCB_RECEPTION_MODULE_SITE.<test_type>` |
+| `BARE_MODULE` | `QC_results_pdb.BAREMODULERECEPTION.<test_type>` |
+| `MODULE` | `QC_results_pdb.MODULE/ASSEMBLY.<test_type>` |
 
 ---
 
 ## Component Lookup
 
 **See also:** [INTRO.md](INTRO.md) for component type overview.
-
-### `find_component_by_serial_tool`
-
-Find a component by its serial number.
-
-**Parameters:**
-| Name | Type | Required | Default | Description |
-|------|------|----------|---------|-------------|
-| `serial_number` | string | Yes | - | Serial number to search |
-| `partial` | boolean | No | false | Enable partial match |
-| `limit` | integer | No | 20 | Max results for partial |
-| `projection` | object | No | - | Fields to include/exclude (e.g., {"serialNumber": 1, "componentType": 1}) |
-
-**Example:**
-```json
-{
-  "tool": "find_component_by_serial_tool",
-  "parameters": {
-    "serial_number": "20UPGM24830846",
-    "projection": {"serialNumber": 1, "componentType": 1, "currentStage": 1}
-  }
-}
-```
-
----
-
-### `find_flex_pcb_by_serial_tool`
-
-Find a flex PCB by its serial number.
-
-**Parameters:** Same as `find_component_by_serial_tool` (including `projection`)
-
-**Example:**
-```json
-{
-  "tool": "find_flex_pcb_by_serial_tool",
-  "parameters": {
-    "serial_number": "20UPGPQ2830070",
-    "projection": {"serialNumber": 1, "componentType": 1}
-  }
-}
-```
-
----
-
-### `find_bare_module_by_serial_tool`
-
-Find a bare module by its serial number.
-
-**Parameters:** Same as `find_component_by_serial_tool` (including `projection`)
-
-**Example:**
-```json
-{
-  "tool": "find_bare_module_by_serial_tool",
-  "parameters": {
-    "serial_number": "20UPGB42000033",
-    "projection": {"serialNumber": 1, "componentType": 1}
-  }
-}
-```
-
----
 
 ### `find_component_by_id_tool`
 
@@ -694,80 +623,7 @@ Batch fetch component details for multiple ObjectIds in a single query. This is 
 
 ## Quad Module Lookup
 
-**See also:** [MODULE.md](MODULE.md) for production stages, test types, and quad module details.
-
-### `find_quad_module_by_serial_tool`
-
-Find a quad module by its serial number.
-
-**Parameters:** Same as `find_component_by_serial_tool` (including `projection`)
-
-**Example:**
-```json
-{
-  "tool": "find_quad_module_by_serial_tool",
-  "parameters": {
-    "serial_number": "20UPGM24830846",
-    "projection": {"serialNumber": 1, "componentType": 1, "currentStage": 1}
-  }
-}
-```
-
----
-
-### `find_quad_module_by_alternative_id_tool`
-
-Find a quad module by its alternative identifier (e.g., Paris0001).
-
-**Parameters:**
-| Name | Type | Required | Default | Description |
-|------|------|----------|---------|-------------|
-| `alternative_id` | string | Yes | - | Alternative ID |
-| `partial` | boolean | No | false | Partial match |
-| `limit` | integer | No | 20 | Max results |
-| `projection` | object | No | - | Fields to include/exclude |
-
-**Example:**
-```json
-{
-  "tool": "find_quad_module_by_alternative_id_tool",
-  "parameters": {
-    "alternative_id": "Paris0076",
-    "projection": {"serialNumber": 1, "componentType": 1}
-  }
-}
-```
-
----
-
-### `find_production_quad_modules_tool`
-
-Find all production quad modules with optional filters.
-
-**CAUTION:** This collection can be very large. Always call `count_tool` first to check result volume, then paginate with small limit values.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `fe_chip_version` | string | No | '0'=RD53A, '1'=ITkpix_v1, '2'=ITkpix_v1.1, '3'=ITkpix_v2 |
-| `is_preproduction` | boolean | No | Filter by preproduction status |
-| `limit` | integer | No | Default: 10 (hard cap: 50) |
-| `skip` | integer | No | Default: 0 |
-| `projection` | object | No | Fields to include/exclude |
-
-**Example:**
-```json
-{
-  "tool": "find_production_quad_modules_tool",
-  "parameters": {
-    "fe_chip_version": "3",
-    "limit": 10,
-    "projection": {"serialNumber": 1, "properties.FECHIP_VERSION": 1}
-  }
-}
-```
-
----
+**See also:** [MODULE.md](components/MODULE.md) for production stages, test types, and quad module details.
 
 ### `find_quad_module_tests_by_stage_tool`
 
@@ -794,35 +650,6 @@ Find all tests for a quad module at a specific production stage.
     "component_id": "67c981355ae416616e2a8974",
     "stage": "MODULE/WIREBONDING",
     "projection": {"testType": 1, "passed": 1, "prodDB_record.date": 1}
-  }
-}
-```
-
----
-
-### `find_latest_quad_module_test_tool`
-
-Find the latest test of a specific type for a quad module.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `component_id` | string | Yes | Quad module ObjectId |
-| `test_type` | string | Yes | Test type |
-| `stage` | string | Yes | Production stage |
-| `projection` | object | No | Fields to include/exclude |
-
-**Test Types:** `MASS_MEASUREMENT`, `QUAD_MODULE_METROLOGY`, `IV_MEASURE`, `E_SUMMARY`
-
-**Example:**
-```json
-{
-  "tool": "find_latest_quad_module_test_tool",
-  "parameters": {
-    "component_id": "67c981355ae416616e2a8974",
-    "test_type": "MASS_MEASUREMENT",
-    "stage": "MODULE/ASSEMBLY",
-    "projection": {"testType": 1, "passed": 1, "results.MASS": 1}
   }
 }
 ```
@@ -883,169 +710,9 @@ Find quad modules with wirebonding problems.
 
 ---
 
-## Production Components
-
-**See also:** [PCB.md](PCB.md) for flex PCB details and [BARE_MODULE.md](BARE_MODULE.md) for bare module details.
-
-### `find_production_flex_pcbs_tool`
-
-Find all production flex PCBs (PCB_DESIGN_VERSION 4 or 5).
-
-**CAUTION:** Large collection. Use `count_tool` first to check volume.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `manufacturer` | string | No | Filter by manufacturer |
-| `limit` | integer | No | Default: 10 (hard cap: 50) |
-| `skip` | integer | No | Default: 0 |
-| `projection` | object | No | Fields to include/exclude |
-
-**Example:**
-```json
-{
-  "tool": "find_production_flex_pcbs_tool",
-  "parameters": {
-    "manufacturer": "Tecnomec",
-    "limit": 10,
-    "projection": {"serialNumber": 1, "properties.PCB_DESIGN_VERSION": 1}
-  }
-}
-```
-
----
-
-### `find_production_bare_modules_tool`
-
-Find all production bare modules with optional filters.
-
-**CAUTION:** Large collection. Use `count_tool` first to check volume.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `fe_chip_version` | string | No | FE chip version filter |
-| `vendor` | string | No | Vendor filter |
-| `with_sensor` | boolean | No | Only modules with sensor |
-| `limit` | integer | No | Default: 10 (hard cap: 50) |
-| `skip` | integer | No | Default: 0 |
-| `projection` | object | No | Fields to include/exclude |
-
-**Example:**
-```json
-{
-  "tool": "find_production_bare_modules_tool",
-  "parameters": {
-    "fe_chip_version": "3",
-    "with_sensor": true,
-    "projection": {"serialNumber": 1, "properties.FECHIP_VERSION": 1}
-  }
-}
-```
-
----
-
-## Test Results
-
-**See also:** [MODULE.md](MODULE.md) §3, [BARE_MODULE.md](BARE_MODULE.md) §5, [PCB.md](PCB.md) §4 for test type details by component.
-
-### `find_latest_pcb_test_tool`
-
-Find the latest test for a flex PCB at PCB_RECEPTION_MODULE_SITE stage.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `component_id` | string | Yes | Flex PCB ObjectId |
-| `test_type` | string | Yes | Test type |
-| `projection` | object | No | Fields to include/exclude |
-
-**Example:**
-```json
-{
-  "tool": "find_latest_pcb_test_tool",
-  "parameters": {
-    "component_id": "67c981355ae416616e2a8974",
-    "test_type": "MASS",
-    "projection": {"testType": 1, "passed": 1, "results.MASS": 1}
-  }
-}
-```
-
----
-
-### `find_latest_bare_module_test_tool`
-
-Find the latest test for a bare module at BAREMODULERECEPTION stage.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `component_id` | string | Yes | Bare module ObjectId |
-| `test_type` | string | Yes | Test type |
-| `projection` | object | No | Fields to include/exclude |
-
-**Example:**
-```json
-{
-  "tool": "find_latest_bare_module_test_tool",
-  "parameters": {
-    "component_id": "67c981355ae416616e2a8974",
-    "test_type": "MASS_MEASUREMENT",
-    "projection": {"testType": 1, "passed": 1, "results.MASS": 1}
-  }
-}
-```
-
----
-
 ## QC Status
 
-**See also:** [MODULE.md](MODULE.md), [BARE_MODULE.md](BARE_MODULE.md), [PCB.md](PCB.md) for component-specific QC details.
-
-### `find_pcb_with_valid_tests_tool`
-
-Find flex PCBs that have valid tests of specified types.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `test_types` | array | No | List of test types to check |
-| `limit` | integer | No | Default: 10 (hard cap: 50) |
-| `skip` | integer | No | Default: 0 |
-| `projection` | object | No | Fields to include/exclude |
-
-**Example:**
-```json
-{
-  "tool": "find_pcb_with_valid_tests_tool",
-  "parameters": {
-    "test_types": ["MASS", "METROLOGY", "VISUAL_INSPECTION"],
-    "projection": {"serialNumber": 1, "componentType": 1}
-  }
-}
-```
-
----
-
-### `find_bare_modules_with_valid_tests_tool`
-
-Find bare modules that have valid tests of specified types.
-
-**Parameters:** Same as `find_pcb_with_valid_tests_tool` (including `projection`)
-
-**Example:**
-```json
-{
-  "tool": "find_bare_modules_with_valid_tests_tool",
-  "parameters": {
-    "test_types": ["MASS_MEASUREMENT", "VISUAL_INSPECTION"],
-    "projection": {"serialNumber": 1, "componentType": 1}
-  }
-}
-```
-
----
+**See also:** [MODULE.md](components/MODULE.md), [BARE_MODULE.md](components/BARE_MODULE.md), [PCB.md](components/PCB.md) for component-specific QC details.
 
 ### `find_quad_modules_in_status_tool`
 
@@ -1525,31 +1192,148 @@ Download a file from GridFS by its ObjectId.
 
 ---
 
+## Production Statistics
+
+These tools provide high-level aggregated statistics about module production progress without requiring the agent to paginate through large collections.
+
+---
+
+### `count_wirebonded_modules_tool`
+
+Count production modules that completed wirebonding (distinct modules, not test entries). A module with multiple WIREBONDING records at the same stage is counted only once.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `institution` | string | No | Institution code (e.g., `"IRFU"`, `"LPNHE"`). Omit for all sites. |
+| `start_date` | string | No | Lower bound date, ISO 8601 (e.g., `"2026-05-01T00:00:00Z"`) |
+| `end_date` | string | No | Upper bound date, ISO 8601 (e.g., `"2026-05-31T23:59:59Z"`) |
+
+**Returns:** JSON object: `{"institution": "IRFU", "start_date": "...", "end_date": "...", "wirebonded_modules_count": 12}`
+
+**Example:**
+```json
+{
+  "tool": "count_wirebonded_modules_tool",
+  "parameters": {
+    "institution": "IRFU",
+    "start_date": "2026-05-01T00:00:00Z",
+    "end_date": "2026-05-31T23:59:59Z"
+  }
+}
+```
+
+---
+
+### `find_module_signoffs_tool`
+
+List module sign-off events with component identification, sorted by date. Returns one row per sign-off event.
+
+**Parameters:**
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| `institution` | string | No | - | Institution code (e.g., `"IRFU"`). Omit for all sites. |
+| `start_date` | string | No | - | Lower bound date, ISO 8601 |
+| `end_date` | string | No | - | Upper bound date, ISO 8601 |
+| `signoff_test_type` | string | No | `"SIGN_OFF"` | testType used for sign-offs |
+| `limit` | integer | No | 200 | Maximum rows to return |
+| `skip` | integer | No | 0 | Rows to skip for pagination |
+
+**Returns:** JSON array of `{atlasId, alias, stage, signoff_date}` records sorted by `signoff_date` ascending.
+
+**Example:**
+```json
+{
+  "tool": "find_module_signoffs_tool",
+  "parameters": {
+    "institution": "IRFU",
+    "start_date": "2026-01-01T00:00:00Z"
+  }
+}
+```
+
+---
+
+### `count_module_signoffs_by_stage_tool`
+
+Count signed-off modules grouped by production stage. Each (module, stage) pair is counted at most once even if multiple sign-off records exist.
+
+**Parameters:**
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| `institution` | string | No | - | Institution code. Omit for all sites. |
+| `start_date` | string | No | - | Lower bound date, ISO 8601 |
+| `end_date` | string | No | - | Upper bound date, ISO 8601 |
+| `signoff_test_type` | string | No | `"SIGN_OFF"` | testType used for sign-offs |
+
+**Returns:** JSON object with `signoffs_by_stage` array (sorted by count descending) and `total_signoffs`.
+
+**Example:**
+```json
+{
+  "tool": "count_module_signoffs_by_stage_tool",
+  "parameters": {
+    "institution": "IRFU",
+    "start_date": "2026-01-01T00:00:00Z"
+  }
+}
+```
+
+---
+
+## Diagnostic Tools
+
+### `ping_tool`
+
+Check server and MongoDB connectivity. Returns server status and database name.
+
+**Parameters:** None
+
+**Returns:** JSON object: `{"status": "ok", "database": "...", "collections_count": N}`
+
+**Example:**
+```json
+{
+  "tool": "ping_tool",
+  "parameters": {}
+}
+```
+
+**Note:** the server also registers `say_hello_to_mines_student_by_name` — a non-production demo tool (returns a greeting string, no database access). It is intentionally excluded from the 34-tool count above and from the tables below since it performs no LocalDB operation.
+
+---
+
 ## Quick Reference
 
 ### By Collection
 
 | Collection | Tools |
 |------------|-------|
-| `component` | find_component_by_*, find_flex_pcb_*, find_bare_module_*, find_quad_module_*, find_production_*, find_component_summary_tool, find_components_by_ids_tool, **find_component_by_serial_unified_tool, find_component_by_alternative_id_unified_tool, find_production_components_unified_tool** |
-| `QC.result` | find_*_test, find_quad_module_tests_*, find_*_with_*_problems, find_test_summary_tool, find_modules_by_test_criteria_tool, aggregate_tests_by_component_tool, **find_latest_test_unified_tool** |
-| `QC.module.status` | find_*_with_valid_tests_tool, find_quad_modules_in_status_tool, **find_components_with_valid_tests_unified_tool** |
+| `component` | find_component_by_id_tool, find_components_by_ids_tool, find_component_summary_tool, find_quad_module_tests_by_stage_tool, find_quad_modules_with_*, **find_component_by_serial_unified_tool, find_component_by_alternative_id_unified_tool, find_production_components_unified_tool** |
+| `QC.result` | find_quad_module_tests_by_stage_tool, find_quad_modules_with_*_problems_tool, find_test_summary_tool, find_modules_by_test_criteria_tool, aggregate_tests_by_component_tool, **find_latest_test_unified_tool** |
+| `QC.module.status` | find_quad_modules_in_status_tool, **find_components_with_valid_tests_unified_tool** |
 | `comments` | find_comments_by_*, count_tool |
 | `fs.files` (GridFS) | gridfs_* |
+| `QC.result` (aggregated) | count_wirebonded_modules_tool, find_module_signoffs_tool, count_module_signoffs_by_stage_tool |
+| *(server)* | ping_tool |
 
 ### By Use Case
 
 | Use Case | Tools |
 |----------|-------|
-| Find component by ID | find_component_by_id_tool, find_*_by_serial_tool, find_component_summary_tool, find_components_by_ids_tool, **find_component_by_serial_unified_tool, find_component_by_alternative_id_unified_tool** |
-| Get test results | find_latest_*_test_tool, find_quad_module_tests_by_stage_tool, find_test_summary_tool, **find_latest_test_unified_tool** |
+| Find component by serial / alt-ID | **find_component_by_serial_unified_tool, find_component_by_alternative_id_unified_tool**, find_component_summary_tool |
+| Find component by ObjectId | find_component_by_id_tool, find_components_by_ids_tool |
+| Find production components | **find_production_components_unified_tool** |
+| Get test results | **find_latest_test_unified_tool**, find_quad_module_tests_by_stage_tool, find_test_summary_tool |
+| Find components with valid tests | **find_components_with_valid_tests_unified_tool**, find_quad_modules_in_status_tool |
 | Count documents | count_tool |
-| Quality issues | find_*_with_*_issues_tool, find_anomalous_*_tool, **find_components_with_valid_tests_unified_tool** |
+| Quality issues | find_quad_modules_with_visual_inspection_issues_tool, find_quad_modules_with_wirebonding_problems_tool, find_anomalous_*_tool |
 | Comments | find_comments_by_*_tool |
 | Files | gridfs_*_tool |
 | Date-based | find_*_by_date_range_tool |
 | Batch/Joins | find_components_by_ids_tool, find_modules_by_test_criteria_tool, aggregate_tests_by_component_tool |
-| **Unified Tools (Preferred)** | **find_component_by_serial_unified_tool, find_component_by_alternative_id_unified_tool, find_production_components_unified_tool, find_latest_test_unified_tool, find_components_with_valid_tests_unified_tool** |
+| Production statistics | count_wirebonded_modules_tool, find_module_signoffs_tool, count_module_signoffs_by_stage_tool |
+| Diagnostics | ping_tool |
 
 ---
 
@@ -1571,7 +1355,7 @@ Invalid ObjectIds are handled gracefully with warning logs.
 3. **Use pagination** (`skip`/`limit`) for browsing results
 4. **Filter early** with specific parameters instead of client-side filtering
 5. **Use QC.module.status** to check test validity before fetching full test documents
-6. **Prefer Unified Tools** for new development: `find_component_by_serial_unified_tool`, `find_component_by_alternative_id_unified_tool`, `find_production_components_unified_tool`, `find_latest_test_unified_tool`, `find_components_with_valid_tests_unified_tool`
+6. **Use Unified Tools** for component/test queries: `find_component_by_serial_unified_tool`, `find_component_by_alternative_id_unified_tool`, `find_production_components_unified_tool`, `find_latest_test_unified_tool`, `find_components_with_valid_tests_unified_tool`
 
 ---
 

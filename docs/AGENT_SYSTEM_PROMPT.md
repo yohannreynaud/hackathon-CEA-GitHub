@@ -25,12 +25,31 @@ appropriate file before forming queries or answering questions:
 | File | When to use it |
 |---|---|
 | **`INTRO.md`** | Overview and index — start here for orientation |
-| **`MODULE.md`** | Quad module identification, production stages (MODULE/ASSEMBLY → WIREBONDING → INITIAL_WARM → PARYLENE_MASKING), test types, data structure, example queries |
-| **`BARE_MODULE.md`** | Bare module variants (Quad, Digital, Single, Tutorial), properties (FECHIP_VERSION, SENSOR_TYPE, VENDOR), test types at BAREMODULERECEPTION, serial number patterns |
-| **`PCB.md`** | Flex PCB (module_pcb) identification, PCB_DESIGN_VERSION (4=OS, 5=IS), manufacturers (Tecnomec/NCAB), stages (PCB_POPULATION → PCB_QC → PCB_RECEPTION_MODULE_SITE), test types |
-| **`CPR.md`** | `childParentRelation` collection — component hierarchy (module → bare_module + module_pcb + FE chips), navigation patterns, expected child counts, tracing workflows |
+| **`components/MODULE.md`** | Quad module identification, production stages (MODULE/ASSEMBLY → WIREBONDING → INITIAL_WARM → PARYLENE_MASKING), test types, data structure, example queries |
+| **`components/BARE_MODULE.md`** | Bare module variants (Quad, Digital, Single, Tutorial), properties (FECHIP_VERSION, SENSOR_TYPE, VENDOR), test types at BAREMODULERECEPTION, serial number patterns |
+| **`components/PCB.md`** | Flex PCB (module_pcb) identification, PCB_DESIGN_VERSION (4=OS, 5=IS), manufacturers (Tecnomec/NCAB), stages (PCB_POPULATION → PCB_QC → PCB_RECEPTION_MODULE_SITE), test types |
+| **`components/CPR.md`** | `childParentRelation` collection — component hierarchy (module → bare_module + module_pcb + FE chips), navigation patterns, expected child counts, tracing workflows |
 | **`COMMENTS_QUERY_METHOD.md`** | Exact 3-step pattern for retrieving comments by alternative ID: find component → extract ObjectId → query comments collection |
-| **`TOOL_MANUAL.md`** | Full parameter reference for all 38 MCP tools, including the 3 new lightweight tools (count_tool, find_component_summary_tool, find_test_summary_tool) and 3 advanced query tools (find_components_by_ids_tool, find_modules_by_test_criteria_tool, aggregate_tests_by_component_tool) |
+| **`TOOL_MANUAL.md`** | Full parameter reference for every MCP tool exposed by the server |
+
+---
+
+## Question Playbooks — Step-by-Step Recipes
+
+The `playbooks/` directory contains one file per recurring question pattern. Each playbook names the exact tool calls to make, in order, and the output format expected. **Read the matching playbook before improvising a multi-step query** — they encode conventions (e.g. what "Paris" means as an institution grouping, how to compute a stage-completion date) that are easy to get wrong from first principles.
+
+These files are the canonical, tool-agnostic source — usable regardless of which agent (Claude Code, Mistral Vibe, or any other MCP-compatible client) is running them. `.claude/skills/` and `.vibe/skills/` in this repo contain thin pointers to the same files for agents that support project-level Skills auto-discovery; edit the `playbooks/` copy, not the pointers.
+
+| File | When to use it |
+|---|---|
+| **`playbooks/COMPONENT_TIMELINE.md`** | "When was Paris1313 assembled/wirebonded/etc.?", "What stage is X at?" — single named component |
+| **`playbooks/COMPONENT_INVESTIGATION.md`** | "Why is Paris1390 in UNHAPPY/GRAVEYARD?" — single named component, root cause via comments |
+| **`playbooks/PRODUCTION_RATE.md`** | "How many modules were wirebonded/assembled in [period], at [institution/Paris]?" — throughput counts |
+| **`playbooks/SIGNOFF_REPORTS.md`** | Per-module sign-off date/stage tables, or per-stage sign-off counts, since a date |
+| **`playbooks/STAGE_CENSUS.md`** | "How many/which modules are currently at stage X?" — live snapshot, optionally by institution |
+| **`playbooks/RECENT_COMPLETIONS.md`** | "What new modules completed stage X since [date]?" |
+| **`playbooks/GRIDFS_UPLOADS.md`** | "Show me the last N files/scans uploaded by [institution]" |
+| **`playbooks/UNHAPPY_GRAVEYARD_REPORT.md`** | Database-wide survey of ALL modules in UNHAPPY/GRAVEYARD with comments and prior stage |
 
 ---
 
@@ -109,7 +128,7 @@ A projection can reduce a 50 KB component document to under 1 KB. **Always use p
 
 ### 1 — Look up a module by alternative ID (e.g., Paris0076)
 
-See also: **`MODULE.md` §9**, **`COMMENTS_QUERY_METHOD.md`**
+See also: **`components/MODULE.md` §9**, **`COMMENTS_QUERY_METHOD.md`**
 
 ```
 Step 1: find_component_summary_tool(alternative_id="Paris0076")
@@ -126,7 +145,7 @@ Step 3 (for a specific test):
 
 ### 2 — Survey modules by FE chip version
 
-See also: **`MODULE.md` §1**, **`BARE_MODULE.md` §2**
+See also: **`components/MODULE.md` §1**, **`components/BARE_MODULE.md` §2**
 
 ```
 Step 1: count_tool(collection="component",
@@ -141,7 +160,7 @@ Step 2: find_production_quad_modules_tool(fe_chip_version="3", limit=5)
 
 ### 3 — Trace component hierarchy (module → children)
 
-See also: **`CPR.md` §3–4**
+See also: **`components/CPR.md` §3–4**
 
 ```
 Step 1: find_component_summary_tool(alternative_id="Paris0104")
@@ -151,7 +170,7 @@ Step 2: find_all_tool(collection="childParentRelation",
                        filter={"parent": "<module_id>"}, limit=10,
                        projection={"child": 1, "chipId": 1, "status": 1})
         → expect 6 children: 1 bare_module, 1 module_pcb, 4 FE chips
-        (see CPR.md §2 for the exact hierarchy)
+        (see components/CPR.md §2 for the exact hierarchy)
 
 Step 3: find_component_summary_tool for each interesting child ObjectId
 ```
@@ -170,7 +189,7 @@ Step 2: find_comments_by_component_tool(component_id="<id>", limit=20)
 
 ### 5 — Find recent tests across the database
 
-See also: **`MODULE.md` §3**, **`BARE_MODULE.md` §4**, **`PCB.md` §4**
+See also: **`components/MODULE.md` §3**, **`components/BARE_MODULE.md` §4**, **`components/PCB.md` §4**
 
 ```
 Step 1: count_tool(collection="QC.result",
@@ -187,7 +206,7 @@ Step 2: find_tests_by_date_range_tool(start_date="2025-01-01T00:00:00Z",
 
 ## Component Quick Reference
 
-*(Full detail in MODULE.md, BARE_MODULE.md, PCB.md, CPR.md)*
+*(Full detail in components/MODULE.md, components/BARE_MODULE.md, components/PCB.md, components/CPR.md)*
 
 | Component | componentType | Serial pattern | chipType |
 |---|---|---|---|
@@ -207,7 +226,7 @@ Step 2: find_tests_by_date_range_tool(start_date="2025-01-01T00:00:00Z",
 | `"9"` | No FE chip |
 
 ### Production stages — Quad Module
-*(full test-type tables in MODULE.md §3)*
+*(full test-type tables in components/MODULE.md §3)*
 
 `MODULE/ASSEMBLY` → `MODULE/WIREBONDING` → `MODULE/INITIAL_WARM` → `MODULE/PARYLENE_MASKING` → `MODULE/PARYLENE_COATING` → `MODULE/PARYLENE_UNMASKING` → `MODULE/WIREBOND_PROTECTION` → `MODULE/POST_PARYLENE_WARM` → `MODULE/THERMAL_CYCLES` → `MODULE/FINAL_WARM` → `MODULE/FINAL_COLD` → `MODULE/FINAL_METROLOGY` → `MODULE/QC_STATUS` 
 
@@ -216,12 +235,12 @@ special stages for modules with issues
 `MODULE/UNHAPPY`, `MODULE/GRAVEYARD`
 
 ### Production stages — Bare Module
-*(full test-type tables in BARE_MODULE.md §4)*
+*(full test-type tables in components/BARE_MODULE.md §4)*
 
 `BAREMODULERECEPTION` (single stage for reception QC)
 
 ### Production stages — Flex PCB
-*(full test-type tables in PCB.md §4)*
+*(full test-type tables in components/PCB.md §4)*
 
 `PCB_POPULATION` → `PCB_QC` → `PCB_RECEPTION_MODULE_SITE`
 
